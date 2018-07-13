@@ -31,17 +31,31 @@
                 <input type="textarea" id="profilePic">
                 <h3>Please fill out the survey below so we can find your best friend!</h3>
             </form>
+            <!--
+            <div id="myModal" class="modal">
+
+                    
+                    <div class="modal-content">
+                      <span class="close">&times;</span>
+                      <p>Name of bestFriend: <span id="bfName"></span></p>
+                      <img id="bfImg"src="">
+                    </div>
+                  
+            </div>
+        -->
         </div>
     </div>
 
     <body>
         <script>
+            // var modal = $("#myModal");
+            // modal.style.display = "none"
             $(document).ready(generateQuiz())
 
             function generateQuiz() {
                 $.get("/api/questions", function (data) {
                     var counter = 1
-                    console.log(data);
+
                     data.forEach(function (event) {
                         var queDiv = $("<div>")
                         var html = ""
@@ -78,7 +92,6 @@
                     }
                 }
                 userAnswers.forEach(function (event) {
-                    console.log(event)
                 })
                 var newUser = {
                     "name": username,
@@ -95,13 +108,13 @@
                     req.forEach(function(element){
                         users.push(element)
                     })
-                    console.log(users)
+
                     friendshipComparer(newUser, users)
                     })
                     
                    
 
-                    location.replace("/")
+                    // location.replace("/")
                 })
             
 function friendshipComparer(newuser, users)
@@ -122,8 +135,17 @@ function friendshipComparer(newuser, users)
         bestFriend.friendshipscore = score
         }
     }
-console.log(JSON.stringify(bestFriend))
+    console.log("You're best friend on this site is: " + bestFriend.name)
+    console.log("profile picture: " + bestFriend.profilePic)
+// callModal(JSON.stringify(bestFriend))
 }
+// function callModal(bestFriend)
+// {
+//     modal.style.display = "block"
+//     $("#bfName").html(bestFriend.name)
+//     $("#bfImg").attr("src", bestFriend.profilePic)
+
+// }
         </script>
     </body>
 </body>
