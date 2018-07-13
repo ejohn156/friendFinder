@@ -127,7 +127,7 @@ function friendshipComparer(newuser, users)
     for(var j = 0; j < users.length - 2; j++){
         var score = 0;
         for(var i = 0; i < 10; i++){
-            score += Math.abs(newuser.scores[i] - users[j].scores[i])
+            score += Math.abs(newuser.scores[i] - parseInt(users[j].scores[i]))
         }
         if(score < bestFriend.friendshipscore){
         bestFriend.name = users[j].name
