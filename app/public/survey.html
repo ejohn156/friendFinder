@@ -1,12 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B"
+        crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery.js"></script>
     <title>Document</title>
 </head>
+
 <body>
-    <h1>survey</h1>
+
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h1>Welcome to our friend finding survey!</h1>
+            <form id="friendSurvey">
+                <label for="username">Enter your name</label>
+                <input type="text" id="username">
+                <br>
+                <label for="profilePic">Enter a url for your profile picture</label>
+                <input type="textarea" id="profilePic">
+                <h3>Please fill out the survey below so we can find your best friend!</h3>
+            </form>
+        </div>
+    </div>
+
+    <body>
+        <script>
+            $(document).ready(generateQuiz())
+
+            function generateQuiz() {
+                $.get("/api/questions", function (data) {
+                    var counter = 1
+                    console.log(data);
+                    data.forEach(function (event) {
+                        var queDiv = $("<div>")
+                        var html = ""
+                        html += "<p>" + counter + ")</p>"
+                        counter++
+                        html += "<p>" + event.content + "</p>"
+                        var options = ""
+                        for (var i = 0; i < 5; i++) {
+                            options += '<div class="form-check form-check-inline"><input class="form-check-input" type="radio" name=' + event.name + ' value=' + i + '><label class="form-check-label" for="inlineCheckbox1">' + (i + 1) + '</label></div>'
+                        }
+                        html += options
+                        queDiv.html(html)
+
+                        $("#friendSurvey").append(queDiv)
+                    })
+                    $("#friendSurvey").append("<br><button type='submit'>Submit Survey</button>")
+                })
+
+            }
+            $("#friendSurvey").on("submit", function (event) {
+                event.preventDefault()
+                var username = $("#username").val().trim()
+                var profilePic = $("#profilePic").val().trim()
+
+                var userAnswers = []
+                for (var i = 1; i < 11; i++) {
+                    var btnValue = parseInt($("input[name=question" + i + "]:checked").attr("value")) + 1;
+                    if (btnValue === null) {
+                        userAnswers.push(0)
+                    }
+                    else {
+                        userAnswers.push(parseInt(btnValue))
+
+                    }
+                }
+                userAnswers.forEach(function (event) {
+                    console.log(event)
+                })
+                var newUser = {
+                    "name": username,
+                    "photo": profilePic,
+                    "scores": userAnswers
+                }
+
+                $.post("/api/friends", newUser).then(function (data) {
+                    console.log("add.html", data)
+                    return JSON.stringify(data)
+                })
+                var users = []
+                $.get("/api/friends", function (req, res) {
+                    req.forEach(function(element){
+                        users.push(element)
+                    })
+                    console.log(users)
+                    friendshipComparer(newUser, users)
+                    })
+                    
+                   
+
+                    location.replace("/")
+                })
+            
+function friendshipComparer(newuser, users)
+{
+    var bestFriend = {
+        name: "",
+        profilePic: "",
+        friendshipscore: 100
+    }
+    for(var j = 0; j < users.length - 2; j++){
+        var score = 0;
+        for(var i = 0; i < 10; i++){
+            score += Math.abs(newuser.scores[i] - users[j].scores[i])
+        }
+        if(score < bestFriend.friendshipscore){
+        bestFriend.name = users[j].name
+        bestFriend.profilePic = users[j].photo
+        bestFriend.friendshipscore = score
+        }
+    }
+alert(JSON.stringify(bestFriend))
+}
+        </script>
+    </body>
 </body>
+
 </html>
