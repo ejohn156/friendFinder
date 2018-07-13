@@ -1,1 +1,2 @@
 # friendFinder
+THis project is a full stack application that will have the user fill out a survey. Then based on that survey the app will determine who they are most likely to become best friends with from all the other people that are using the site.
